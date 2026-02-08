@@ -1,0 +1,17 @@
+[project]
+name = "assignment3-anomalyalertaiagent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "langchain-ollama>=1.0.1",
+    "pandas>=3.0.0",
+    "rich>=14.3.2",
+    "scikit-learn>=1.8.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
