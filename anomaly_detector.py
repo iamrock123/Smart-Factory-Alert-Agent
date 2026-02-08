@@ -130,21 +130,32 @@ class AnomalyDetector:
             features = ['temp', 'pressure', 'vibration']
             
             # --- Check 1: Hard Rules (Domain) using Helper ---
+            base_penalty = 0
             for feature in features:
                 is_issue, reasons = self._check_threshold(row[feature], feature)
                 if is_issue:
                     row_is_issue = True
                     row_reasons.extend(reasons)
+                    
+                    # Add Base Penalty for Rule Violations
+                    # This ensures Score aligns with Warning (>5) / Critical (>15)
+                    for r in reasons:
+                        if "CRITICAL" in r:
+                            base_penalty += 10
+                        elif "WARNING" in r:
+                            base_penalty += 5
             
             if row_is_issue:
                 # Construct the anomaly record
-                # We use the calculated statistical scores for the 'severity' metric
+                # Score = Weighted Z-Score + Base Penalty
+                final_score = round(row['rule_score'] + base_penalty, 2)
+                
                 anomalies.append({
                     'index': index,
                     'timestamp': row['timestamp'],
                     'data': {k: row[k] for k in features},
                     'reasons': row_reasons,
-                    'score': round(row['rule_score'], 2) # Weighted Z-score sum
+                    'score': final_score 
                 })
         
         return anomalies
